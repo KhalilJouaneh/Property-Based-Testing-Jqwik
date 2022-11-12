@@ -129,6 +129,7 @@ public class AVL<K extends Comparable<K>,V> {
     public AVL<K,V> delete(K k) {
         if (this.isEmpty())
             return this;
+
         else if (this.key.compareTo(k) < 0) {    // k is greater than key in root
             this.right = this.right.delete(k);
             this.height = 1 + max(this.left.height, this.right.height);

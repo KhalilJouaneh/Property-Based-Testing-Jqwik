@@ -1,5 +1,5 @@
-import AVLStarter.AVL;
-// import AVLCorrected.AVL;   // enable for testing your bug fixes
+//import AVLStarter.AVL;
+ import AVLCorrected.AVL;   // enable for testing your bug fixes
 import net.jqwik.api.*;
 import net.jqwik.api.Tuple.Tuple1;
 import net.jqwik.api.Tuple.Tuple2;
@@ -270,12 +270,64 @@ class AVLProperties {
 
 	// Q2a, Property P1: "find(k) after insert(k,v) produces v (i.e., after insert(k,v), the tree stores v under k)"
 	// <Your implementation of P1 here>
+	@Property
+	@Report(Reporting.GENERATED)
+	void P1(@ForAll("avlTrees") AVL<Integer,Integer> avl, //t
+			@ForAll @IntRange(min=0,max=15) Integer k, //k
+			@ForAll @IntRange(min=0,max=1) Integer v) //v
+		{
+			avl = avl.insert(k,v);
+			//check that k is present in the tree
+			Assertions.assertThat(avl.find(k).isPresent());
+			// check that v is under k
+			Assertions.assertThat(avl.find(k).get().equals(v));
+		}
 
 	// Q2b, Property P2: "insert(k) increases number of nodes by 1 if k new, and maintains it otherwise"
+	// After inserting value 0 under key k in t, if t contains k, then the insertion does not change the number of nodes of the tree,
+	// and if t does not contain k, then the insertion increases the number of nodes by exactly 1	".
 	// <Your implementation of P2 here>
+	@Property
+	@Report(Reporting.GENERATED)
+	void P2(@ForAll("avlTrees") AVL<Integer,Integer> t,
+			@ForAll @IntRange(min=0,max=15) Integer k){
+
+		int preNumOfNode = numNodes(t); //number of nodes before insertion
+
+		AVL<Integer, Integer> t1 = t.clone(); //clone original t
+		t1 = t1.insert(k,0); //copy it to variable t1
+
+		int postNumOfNode = numNodes(t1); //number of nodes after insertion
+
+		if (t.find(k).isPresent()) {
+			Assertions.assertThat(preNumOfNode).isEqualTo(postNumOfNode); //insertion does not change number of nodes in a tree
+		} else {
+			Assertions.assertThat(postNumOfNode-preNumOfNode).isEqualTo(1); //1 = number of nodes after - number of nodes before
+		}
+
+	}
 
 	// Q2c, Property P3: "insert(k) increases height of tree by at most 1 if k new, and maintains it otherwise"
 	// <Your implementation of P3 here>
+	@Property
+	@Report(Reporting.GENERATED)
+	void P3(@ForAll("avlTrees") AVL<Integer,Integer> t, //t
+			@ForAll @IntRange(min=0,max=15) Integer k,
+			@ForAll @IntRange(min=0,max=1) Integer v)//k
+	{
+		int preHeightOfTree = height(t); //height before insertion
+
+		AVL<Integer, Integer> t1 = t.clone(); //clone original t
+		t1 = t1.insert(k,0); //copy it to variable t1
+
+		int postHeightOfTree = height(t1); //height after insertion
+
+		if (t.find(k).isPresent()) { //if t contains k
+			Assertions.assertThat(preHeightOfTree).isEqualTo(postHeightOfTree); //check equality
+		} else {
+			Assertions.assertThat(postHeightOfTree-preHeightOfTree).isLessThanOrEqualTo(1); //insertion increases height by at most 1
+		}
+	}
 
 	/***********************************************
 	 * SUB-SECTION: PROPERTIES TO TEST 'DELETE'
@@ -285,32 +337,102 @@ class AVLProperties {
 	 * - all helper methods defined in this class
 	 **********************************************/
 
+	//An AVL tree is  balanced binary search tree, in which the heights of the left and right subtrees
+	// of each node differ by at most one
+
+	//After each insert and delete operation,
+	// this invariant is verified, and the balance is restored by AVL rotation if necessary.
+
+
+
 	// Property 1
-	// <informal description here>
-	// Fails on starter code: <yes or no answer here>
-	// Fails on corrected code: <yes or no answer here>
+	// Informal Description: Delete key k from tree, if key is , then number of nodes must be decreased by 1,
+	// if key is not present then the number of nodes stays the same
+
+	// Fails on starter code: Yes
+	// Fails on corrected code: No
 	// <Your implementation of property here>
 
+	@Property
+	@Report(Reporting.GENERATED)
+	void Q3a (@ForAll("avlTrees") AVL<Integer,Integer> t, //t
+			  @ForAll @IntRange(min=0,max=15) Integer k) {
+
+		int preNumOfNodes = numNodes(t); //before deletion of k
+
+		boolean kInTree = t.find(k).isPresent(); //check if k is present in tree
+
+		t = t.delete(k); //delete k from tree
+
+		int postNumOfNodes = numNodes(t); //after delete
+
+		if (kInTree) {
+			Assertions.assertThat(preNumOfNodes-1).isEqualTo(postNumOfNodes); //check if number of nodes decreased by 1
+		} else {
+			Assertions.assertThat(preNumOfNodes).isEqualTo(postNumOfNodes); //check if number of nodes stayed the same
+		}
+	}
 
 	// Property 2
-	// <informal description here>
-	// Fails on starter code: <yes or no answer here>
-	// Fails on corrected code: <yes or no answer here>
+	// After a k is deleted from t, if k is present, the height of subtrees should differ by at most 1
+	// Fails on starter code: Yes
+	// Fails on corrected code: No
 	// <Your implementation of property here>
+	@Property
+	@Report(Reporting.GENERATED)
+	void Q3b (@ForAll("avlTrees") AVL<Integer,Integer> t, //t
+			  @ForAll @IntRange(min=0,max=15) Integer k) {
+
+		boolean kInTree = t.find(k).isPresent(); //check if k is present in tree
+
+		t = t.delete(k); //delete k from tree
+
+		boolean isBalanced = isBalanced(t);
+
+		if (kInTree) {
+			Assertions.assertThat(isBalanced).isTrue(); //height of subtrees differs by at most 1
+		}
+	}
 
 
 	// Property 3
-	// <informal description here>
-	// Fails on starter code: <yes or no answer here>
-	// Fails on corrected code: <yes or no answer here>
+	// After deleting k from t, assert balance factor stays between -1 and 1
+	// Fails on starter code: Yes
+	// Fails on corrected code: No
 	// <Your implementation of property here>
+
+	boolean getBalanceFactor(AVL<Integer, Integer> t) {
+		if (t == null || numNodes(t) <= 1) return true;
+		if (t.balFactor() >= 2 || t.balFactor() <= -2) return false;
+		return getBalanceFactor(t.left) && getBalanceFactor(t.right);
+	}
+	@Property
+	@Report(Reporting.GENERATED)
+	void Q3c(@ForAll("avlTrees") AVL<Integer, Integer> t, @ForAll @IntRange(min = 0, max = 15) Integer k) {
+		Assertions.assertThat(getBalanceFactor(t.delete(k))).isTrue();
+	}
 
 
 	// Property 4
-	// <informal description here>
-	// Fails on starter code: <yes or no answer here>
-	// Fails on corrected code: <yes or no answer here>
+	//after deleting key k from tree t, check that the nodes are still in order
+	// Fails on starter code: Yes
+	// Fails on corrected code: No
 	// <Your implementation of property here>
+	@Property
+	@Report(Reporting.GENERATED)
+	void Q3d (@ForAll("avlTrees") AVL<Integer,Integer> t, //t
+			  @ForAll @IntRange(min=0,max=15) Integer k) {
+
+		boolean kInTree = t.find(k).isPresent(); //check if k is present in tree
+
+		t= t.delete(k);
+
+		ArrayList<Integer> listInOrder = keysInOrder(t); //call function to get keysInOrder to check if it is sorted later
+
+		if (kInTree) { //if key exists
+			Assertions.assertThat(isSortedInStrictAscendingOrder(listInOrder)).isTrue(); //check if tree is still sorted after deletion
+		}
+	}
 
 
 	/****************************************************************************************

@@ -151,7 +151,8 @@ public class AVL<K extends Comparable<K>,V> {
                     this.value = this.right.value;
                     this.left = this.right.left;
                     this.right = this.right.right;
-                    this.height = this.right.height;
+//                  this.height = this.right.height;  //bug 1
+                    this.height = 1 + max(this.left.height, this.right.height); //fixed
                     return this.rebalance();
                 }
             else {                                          // node to be deleted has a left child
@@ -160,7 +161,8 @@ public class AVL<K extends Comparable<K>,V> {
                     leftRightMostB = leftRightMostB.right;
                 this.key = leftRightMostB.key;
                 this.value = leftRightMostB.value;
-                this.left = this.left.delete(k);
+//              this.left = this.left.delete(k);   //bug 2
+                this.left = this.left.delete(leftRightMostB.key); //fixed
                 this.height = 1 + max(this.left.height, this.right.height);
                 return this.rebalance();
             }
@@ -172,7 +174,8 @@ public class AVL<K extends Comparable<K>,V> {
     public AVL<K,V> rebalance() {
         AVL<K,V> p = this;
         if (p.balFactor() > 1) {                  // p is too right-heavy
-            if (p.right.balFactor() > 0)
+//            if (p.right.balFactor() > 0) //bug 3
+            if (p.right.balFactor() >= 0) //fix
                 p = p.rotateLeft();               // need one left rotation around the root
             else {
                 p.right = p.right.rotateRight();  // need right rotation around the right child followed by a left rotation around the root
