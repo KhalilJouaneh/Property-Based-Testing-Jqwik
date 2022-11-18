@@ -387,10 +387,8 @@ class AVLProperties {
 
 		t = t.delete(k); //delete k from tree
 
-		boolean isBalanced = isBalanced(t);
-
 		if (kInTree) {
-			Assertions.assertThat(isBalanced).isTrue(); //height of subtrees differs by at most 1
+			Assertions.assertThat(isBalanced(t)).isTrue(); //height of subtrees differs by at most 1
 		}
 	}
 
@@ -402,8 +400,8 @@ class AVLProperties {
 	// <Your implementation of property here>
 
 	boolean getBalanceFactor(AVL<Integer, Integer> t) {
-		if (t == null || numNodes(t) <= 1) return true;
 		if (t.balFactor() >= 2 || t.balFactor() <= -2) return false;
+		if (t == null || numNodes(t) <= 1) return true;
 		return getBalanceFactor(t.left) && getBalanceFactor(t.right);
 	}
 	@Property
