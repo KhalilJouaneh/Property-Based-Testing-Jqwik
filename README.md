@@ -1,5 +1,5 @@
 ## Software
-Used Jqwik, an alternative test engine for the JUnit 5 platform that
+I used Jqwik, which is an alternative test engine for the JUnit 5 platform that
 brings property-based testing (PBT) to Java.
 [Jqwik's web site](https://jqwik.net/) contains a detailed, example-based
 [user guide](https://jqwik.net/docs/current/user-guide.html), as well as
