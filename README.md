@@ -4,11 +4,6 @@ brings property-based testing (PBT) to Java.
 [Jqwik's web site](https://jqwik.net/) contains a detailed, example-based
 [user guide](https://jqwik.net/docs/current/user-guide.html), as well as
 pointers to introductory material to PBT in general.
-The latest version of Jqwik is available in the [Maven Central Repository](https://search.maven.org/search?q=g:net.jqwik)
-and the source code can be found on [GitHub](https://github.com/jlink/jqwik).
-Both Gradle and Maven provide support for JUnit, and thus also for Jqwik.
-The starter code for this assignment contains a `gradle.build` file
-suitable building and testing Java applications with Jqwik.
 
 
 ## Learning Outcomes
